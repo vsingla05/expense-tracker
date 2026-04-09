@@ -1,0 +1,2 @@
+1. use bash commands in same terminal where you intract with claud so claud will keep
+track you commands and history
