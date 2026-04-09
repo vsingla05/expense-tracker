@@ -1,2 +1,47 @@
 1. use bash commands in same terminal where you intract with claud so claud will keep
 track you commands and history
+
+2. slash commands -> 1. built-in slash commands
+                     2. custom slash commands
+
+3. sessions -> conversations between claude to exit
+
+4. claude -r    -> give list of conversations so we can resume ony session
+
+5. /resume  -> we can change sessions 
+
+6. one task = one session (alwasy follow)
+
+7. /remane -> to rename current session
+
+8. /btw   -> used to ask question between session, this question will not part in conversation history
+
+9. just enter press so it remove question and answer
+
+10. /export   -> this will export all chat history inside current folder for particular session
+
+11. /logout, /login
+
+12. claude models -> (opus, sonnet, haiku)
+
+13. use opus for planning phase, architecture, making decisions
+    then switch to sonnet for implementations
+
+14. /efforts    -> (only for opus for better reasoning)
+
+15. /usage    
+
+16. /extra-usage   -> for upgrade current plan
+
+17. /stats
+
+18. /insights   -> generate html file based on conversations which include what we did right,
+                   what we did wrong, area of imporvemets, etc
+
+19. /config
+
+20. /permissions
+
+21. /theme
+
+22. /voice
