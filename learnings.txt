@@ -45,3 +45,79 @@ track you commands and history
 21. /theme
 
 22. /voice
+
+23. ollama models cannot understand images
+
+24.context -> all information available to understand something correctly
+
+25. context window -> amount of imformation in tokens that model like claude can see and 
+                      remember at one time while generating a response
+
+26. claude code has context window of 200K tokens
+
+27. each new session starts with new context window
+
+28. subagents get thier own isolated context window which is completely seperate from main session
+
+29. subagents returns only summary to main context not full working history
+
+30. auto compact     -> when token limit reach to about 75-80% claude summarize whole history
+
+31. /compact  -> summarize whole history and stored in 33k reserved tokens
+
+32. if 33k tokens filled then we can trigger sub-agents
+
+33. use subagents for isolated and explortory work
+
+34. use .claudeignore to keep irrevelant files out
+
+35. content of claude.md file
+    1. project context   -> short description of project
+    2. Architecture
+    3. Code Style
+    3. Preffered Libraries
+    4. Commands
+    5. critical rules  -> highligts critical warnings, edge cases and things to avoid
+
+36. claude folder  -> claude local configuration directory that controls how claude behaves
+    it stores all info about skills, custom slash commands, subagents, etc
+
+37. types of claude folder: 
+                          1. project level -> .claude/  -> scoped to one project, shared with teams
+                          2. global/user-level -> ~/.claude/   -> scoped with you machine, applied to any project, personal to you
+
+
+38.   (inside cloude folder local) ./claude.local.md (personal, gitignore)
+
+39.   (insde root directory glogal)
+
+40.    (inside any particular folder)
+
+41. we can add important keywords in claude.md file
+
+42. .claude/rules/
+                -code-Style.md
+                -testing.md
+                security.md
+
+43. auto memory -> directory where claude redords learnings, patterns and insights as it works.
+    it lives in ~/.claude/projects/<project>/memory/:
+
+44. only 200 line of memory file loads so write accordingly
+
+45. we can also write manually like (update your memroy files - <feature>)
+
+46. spec-driven development    -> approach where detailed specificaition document is written before
+                                  any code is written. the spec act as single source of truth
+
+47. idea spec-document   -> 1. problem statement
+                            2. functional requirements
+                            3. api contract (inputs, output, data shapes)
+                            4. constraints
+                            5. edge cases and error handling
+                            6. acceptance criteria
+
+
+48. life cycle of spec-document deployment: 
+        spec -> review -> design(tech stack) -> review -> tasks -> build -> validate
+
