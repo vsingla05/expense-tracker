@@ -121,3 +121,20 @@ track you commands and history
 48. life cycle of spec-document deployment: 
         spec -> review -> design(tech stack) -> review -> tasks -> build -> validate
 
+
+49. good practices -> 1. model selection
+                      2. extended thinking (/config -> thinking)
+                      3. efforts level (/effort )
+                      4. ultraplan (/ultraplan)
+
+50. custom slash commands  -> 1. saved prompts that invokes when we call /command_name
+                              2. used for repetable tasks
+                              3. stored as markdown in ./claude
+                              4. two types: project scoped and user scoped
+
+51. examples of custom slash commands: 1. /review -> review on current file
+                                       2. /commit -> commit to github
+                                       3. /test -> run test suit and analyze any failure
+                                       4. /security-scan -> scan the codebase for vulnerablities like sql injection
+                                       
+
