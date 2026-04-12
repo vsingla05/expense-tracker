@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from database.db import get_db, init_db, seed_db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -18,13 +19,77 @@ def landing():
     return render_template("landing.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        # Extract form data
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        # Validation
+        if not name:
+            return render_template("register.html", error="Name is required")
+
+        if not email or "@" not in email:
+            return render_template("register.html", error="Valid email is required")
+
+        if len(password) < 6:
+            return render_template("register.html", error="Password must be at least 6 characters")
+
+        # Hash password
+        password_hash = generate_password_hash(password)
+
+        # Insert user into database
+        conn = get_db()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+                (name, email, password_hash)
+            )
+            conn.commit()
+            return redirect(url_for("login"))
+        except Exception:
+            # Duplicate email or other database error
+            return render_template("register.html", error="Email already registered")
+        finally:
+            conn.close()
+
     return render_template("register.html")
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        # Extract form data
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        # Validation
+        if not email or "@" not in email:
+            return render_template("login.html", error="Valid email is required")
+
+        if not password:
+            return render_template("login.html", error="Password is required")
+
+        # Look up user by email
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, name, password_hash FROM users WHERE email = ?",
+            (email,)
+        )
+        user = cursor.fetchone()
+        conn.close()
+
+        if not user or not check_password_hash(user["password_hash"], password):
+            return render_template("login.html", error="Invalid email or password")
+
+        # Login successful - store user info in session
+        # For now, just redirect to a welcome page
+        return redirect(url_for("profile"))
+
     return render_template("login.html")
 
 
