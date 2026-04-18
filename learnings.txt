@@ -136,5 +136,28 @@ track you commands and history
                                        2. /commit -> commit to github
                                        3. /test -> run test suit and analyze any failure
                                        4. /security-scan -> scan the codebase for vulnerablities like sql injection
+
+
+52. skills are reusable, file based resources that provides claude with domain-specific
+experties such as context, workflows and best practices that transform general purpose
+agents into specialists.
+skills loads on demand
+
+53. progressive disclosure -> don't load information until the moment it is needed
+
+54. how skills load in context window: 
+                                    1. L1- > the description always loads
+                                    2. L2- > if there is need of skill then it loads the skill.md body
+                                    3. L3- > referenced resources loaded (if needed)
+                        
+55. system prompt always stay in context window whether it is needed or not
+
+56. types of skills: 1. personal skills -> applied to all projects
+                     2. project based skills -> applied to particular project
+
+
+57. ways to create skill: 1. manually
+                          2. use claude skill-creater skill
+                          3. install from community sources
                                        
 
