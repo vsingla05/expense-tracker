@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session
 from database.db import get_db, init_db, seed_db
+from database.queries import get_category_breakdown, get_recent_transactions, get_summary_stats, get_user_by_id
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -132,7 +133,32 @@ def logout():
 @app.route("/profile")
 @login_required
 def profile():
-    return "Profile page — coming in Step 4"
+    user_id = session.get("user_id")
+
+    # Fetch user data from database
+    user = get_user_by_id(user_id)
+    if not user:
+        # Fallback if user not found
+        user = {
+            "name": session.get("user_name", "User"),
+            "email": "",
+            "initials": "U",
+            "member_since": "Unknown"
+        }
+    else:
+        # Add initials for the avatar
+        user["initials"] = "".join([word[0].upper() for word in user["name"].split()])
+
+    # Fetch summary stats from database
+    stats = get_summary_stats(user_id)
+
+    # Fetch recent transactions from database
+    transactions = get_recent_transactions(user_id, limit=10)
+
+    # Fetch category breakdown from database
+    categories = get_category_breakdown(user_id)
+
+    return render_template("profile.html", user=user, stats=stats, transactions=transactions, categories=categories)
 
 
 @app.route("/expenses/add")
@@ -154,4 +180,4 @@ def delete_expense(id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000)
