@@ -16,7 +16,7 @@ track you commands and history
 
 8. /btw   -> used to ask question between session, this question will not part in conversation history
 
-9. just enter press so it remove question and answer
+9. just press enter so it remove question and answer
 
 10. /export   -> this will export all chat history inside current folder for particular session
 
@@ -110,7 +110,7 @@ track you commands and history
 46. spec-driven development    -> approach where detailed specificaition document is written before
                                   any code is written. the spec act as single source of truth
 
-47. idea spec-document   -> 1. problem statement
+47. ideal spec-document   -> 1. problem statement
                             2. functional requirements
                             3. api contract (inputs, output, data shapes)
                             4. constraints
@@ -159,5 +159,39 @@ skills loads on demand
 57. ways to create skill: 1. manually
                           2. use claude skill-creater skill
                           3. install from community sources
-                                       
 
+58. disable-model-invocation: true
+                                       
+59. lost in the middle effect  -> llms pay more attention to start and end of context
+
+60. subagents: specialized ai assistent that run in their own isolated context window
+perform specific task and return what matters
+
+61. advantages of subagents: 1. context isolation
+                             2. specialization
+                             3. modularity
+                             4. parallelism
+
+62. top use cases: 1. codebase exploration
+                   2. codebase review
+                   3. verification and validation
+                   4. multi-stage pipeline
+                   5. parallel independent tasks
+                   6. security auditing
+
+63. types of subagents: 1. built-in subagents : 1. explore
+                                                2. plan
+                                                3. general purpose
+                        
+                        2. custom subagents with configurations : 1. tools
+                                                                  2. prompt
+                                                                  3. hooks
+                                                                  4. models
+                                                                  5. permissions
+                                                                  6. skills
+
+64. /observe start  -> open an application which monitor everything happens in conversations
+codebase and we can also see how subagents works
+
+65. ways to trigger subagents -> 1. automatically
+                                 2. manually
