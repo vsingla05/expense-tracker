@@ -43,13 +43,15 @@ def get_user_by_id(user_id):
     }
 
 
-def get_recent_transactions(user_id, limit=10):
+def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
     """
     Fetch recent transactions for a user.
 
     Args:
         user_id: The ID of the user whose transactions to fetch
         limit: Maximum number of transactions to return (default 10)
+        date_from: Optional start date (YYYY-MM-DD) for filtering
+        date_to: Optional end date (YYYY-MM-DD) for filtering
 
     Returns:
         List of dicts with keys: date, description, category, amount
@@ -58,16 +60,21 @@ def get_recent_transactions(user_id, limit=10):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    query = """
         SELECT date, description, category, amount
         FROM expenses
         WHERE user_id = ?
-        ORDER BY date DESC
-        LIMIT ?
-        """,
-        (user_id, limit)
-    )
+    """
+    params = [user_id]
+
+    if date_from and date_to:
+        query += " AND date BETWEEN ? AND ?"
+        params.extend([date_from, date_to])
+
+    query += " ORDER BY date DESC LIMIT ?"
+    params.append(limit)
+
+    cursor.execute(query, params)
 
     rows = cursor.fetchall()
     conn.close()
@@ -84,12 +91,14 @@ def get_recent_transactions(user_id, limit=10):
     return transactions
 
 
-def get_summary_stats(user_id):
+def get_summary_stats(user_id, date_from=None, date_to=None):
     """
     Get summary statistics for a user's expenses.
 
     Args:
         user_id: The ID of the user to get stats for.
+        date_from: Optional start date (YYYY-MM-DD) for filtering
+        date_to: Optional end date (YYYY-MM-DD) for filtering
 
     Returns:
         dict with keys: total_spent, transaction_count, top_category
@@ -98,10 +107,18 @@ def get_summary_stats(user_id):
     conn = get_db()
     cursor = conn.cursor()
 
+    # Build base query with optional date filter
+    base_where = "WHERE user_id = ?"
+    params = [user_id]
+
+    if date_from and date_to:
+        base_where += " AND date BETWEEN ? AND ?"
+        params.extend([date_from, date_to])
+
     # Query total spent and transaction count
     cursor.execute(
-        "SELECT SUM(amount), COUNT(*) FROM expenses WHERE user_id = ?",
-        (user_id,)
+        f"SELECT SUM(amount), COUNT(*) FROM expenses {base_where}",
+        params
     )
     result = cursor.fetchone()
     total_spent = result[0] if result[0] is not None else 0
@@ -109,8 +126,8 @@ def get_summary_stats(user_id):
 
     # Query top category
     cursor.execute(
-        "SELECT category, SUM(amount) FROM expenses WHERE user_id = ? GROUP BY category ORDER BY SUM(amount) DESC LIMIT 1",
-        (user_id,)
+        f"SELECT category, SUM(amount) FROM expenses {base_where} GROUP BY category ORDER BY SUM(amount) DESC LIMIT 1",
+        params
     )
     top_category_result = cursor.fetchone()
     top_category = top_category_result[0] if top_category_result else "—"
@@ -132,12 +149,14 @@ def get_summary_stats(user_id):
     }
 
 
-def get_category_breakdown(user_id):
+def get_category_breakdown(user_id, date_from=None, date_to=None):
     """
     Get category breakdown of expenses for a user.
 
     Args:
         user_id: The ID of the user
+        date_from: Optional start date (YYYY-MM-DD) for filtering
+        date_to: Optional end date (YYYY-MM-DD) for filtering
 
     Returns:
         List of dicts with keys: name, amount, pct
@@ -147,14 +166,20 @@ def get_category_breakdown(user_id):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """SELECT category, SUM(amount) as amount
-           FROM expenses
-           WHERE user_id = ?
-           GROUP BY category
-           ORDER BY amount DESC""",
-        (user_id,)
-    )
+    query = """
+        SELECT category, SUM(amount) as amount
+        FROM expenses
+        WHERE user_id = ?
+    """
+    params = [user_id]
+
+    if date_from and date_to:
+        query += " AND date BETWEEN ? AND ?"
+        params.extend([date_from, date_to])
+
+    query += " GROUP BY category ORDER BY amount DESC"
+
+    cursor.execute(query, params)
 
     rows = cursor.fetchall()
     conn.close()

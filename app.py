@@ -1,8 +1,10 @@
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database.db import get_db, init_db, seed_db
 from database.queries import get_category_breakdown, get_recent_transactions, get_summary_stats, get_user_by_id
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 app = Flask(__name__)
 app.secret_key = "spendly-dev-secret-key-change-in-production"
@@ -149,16 +151,79 @@ def profile():
         # Add initials for the avatar
         user["initials"] = "".join([word[0].upper() for word in user["name"].split()])
 
+    # Read and validate date filter parameters
+    date_from_raw = request.args.get("date_from")
+    date_to_raw = request.args.get("date_to")
+
+    date_from = None
+    date_to = None
+
+    # Validate dates
+    if date_from_raw:
+        try:
+            date_from = datetime.strptime(date_from_raw, "%Y-%m-%d").date()
+        except ValueError:
+            date_from = None
+
+    if date_to_raw:
+        try:
+            date_to = datetime.strptime(date_to_raw, "%Y-%m-%d").date()
+        except ValueError:
+            date_to = None
+
+    # If both dates are valid but date_from > date_to, show error and fall back to unfiltered
+    if date_from and date_to and date_from > date_to:
+        flash("Start date must be before end date.")
+        date_from = None
+        date_to = None
+
+    # Convert dates back to strings for queries and template
+    date_from_str = date_from.strftime("%Y-%m-%d") if date_from else None
+    date_to_str = date_to.strftime("%Y-%m-%d") if date_to else None
+
     # Fetch summary stats from database
-    stats = get_summary_stats(user_id)
+    stats = get_summary_stats(user_id, date_from=date_from_str, date_to=date_to_str)
 
     # Fetch recent transactions from database
-    transactions = get_recent_transactions(user_id, limit=10)
+    transactions = get_recent_transactions(user_id, limit=10, date_from=date_from_str, date_to=date_to_str)
 
     # Fetch category breakdown from database
-    categories = get_category_breakdown(user_id)
+    categories = get_category_breakdown(user_id, date_from=date_from_str, date_to=date_to_str)
 
-    return render_template("profile.html", user=user, stats=stats, transactions=transactions, categories=categories)
+    # Compute preset date ranges for active state highlighting
+    today = datetime.now().date()
+    this_month_from = today.replace(day=1)
+    last_3_months_from = today - relativedelta(months=3)
+    last_6_months_from = today - relativedelta(months=6)
+
+    # Determine which preset is active (if any)
+    active_preset = None
+    if date_from and date_to:
+        if date_from == this_month_from and date_to == today:
+            active_preset = "this_month"
+        elif date_from == last_3_months_from and date_to == today:
+            active_preset = "last_3_months"
+        elif date_from == last_6_months_from and date_to == today:
+            active_preset = "last_6_months"
+        else:
+            active_preset = "custom"
+    elif not date_from_raw and not date_to_raw:
+        active_preset = "all_time"
+
+    return render_template(
+        "profile.html",
+        user=user,
+        stats=stats,
+        transactions=transactions,
+        categories=categories,
+        date_from=date_from_str,
+        date_to=date_to_str,
+        active_preset=active_preset,
+        this_month_from=this_month_from.strftime("%Y-%m-%d"),
+        last_3_months_from=last_3_months_from.strftime("%Y-%m-%d"),
+        last_6_months_from=last_6_months_from.strftime("%Y-%m-%d"),
+        today=today.strftime("%Y-%m-%d")
+    )
 
 
 @app.route("/expenses/add")

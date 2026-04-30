@@ -203,3 +203,5 @@ codebase and we can also see how subagents works
 
 68. security-review-feature: 2 subagents : 1. security review
                                            2. code quality review
+
+69. create branch -> spec, implement, validate -> testing -> self code review -> commit changes -> delete branch
