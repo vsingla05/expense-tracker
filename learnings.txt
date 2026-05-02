@@ -205,3 +205,16 @@ codebase and we can also see how subagents works
                                            2. code quality review
 
 69. create branch -> spec, implement, validate -> testing -> self code review -> commit changes -> delete branch
+
+70. MCP (model context protcol (/mcp)) -> it is open standard created by anthropic which act as 
+    universal connector between llm and external tools, services and data sources.
+
+71. some mcp servers: 1. database (we can provide mcp to claude and ask any quesion related to database)
+
+72. context7: it is mcp server that pulls live, up-to-date documentation for any library and framework
+    directly into claude context while you're coding.
+
+73. jira: software management tool by atlassian mainly used to plan, track, and manage work from 
+    bug fixes to full feature development.
+
+74. Notion, slack, AWS, Docker
